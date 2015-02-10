@@ -1,2 +1,2 @@
 # Buggy-Run
-Digital Media Authoring - Buggy Run Game
+Advanced Media Authoring - Buggy Run Game
