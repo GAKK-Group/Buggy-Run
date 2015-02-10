@@ -30,14 +30,14 @@ function init() {
   // ------------
 
   // create a WebGL renderer.
-  renderer = new THREE.WebGLRender();
+  renderer = new THREE.WebGLRenderer();
 
   // Set the rednerer size.
   renderer.setSize(WIDTH, HEIGHT);
 
   // Get element from the document ( our div) and append
   // the domElement (the canvas) to it.
-  var docElement = document.getElementByID('myDivContainer');
+  var docElement = document.getElementById('myDivContainer');
   docElement.appendChild(renderer.domElement);
 
   // Set the dar colour.
@@ -58,6 +58,7 @@ function init() {
 
   // Set the position of the camera.
   // The camera starts at 0,0,0 ...so we move it back.
+  camera.position.set(0,0, 300);
 
   // Start the scene.
   // --------------------
@@ -87,7 +88,7 @@ function  initScene(){
   });
 
   // create a new mesh with sphere geometry.
-  sphere = new THREE.Mesh( new THREE.SphereGeomety(radius, segments, rings), sphereMaterial);
+  sphere = new THREE.Mesh( new THREE.SphereGeometry(radius, segments, rings), sphereMaterial);
 
   // Alther the position of the sphere. It's default position is 0,0,0.
   sphere.position.y = 2;
@@ -99,13 +100,13 @@ function  initScene(){
   // ----------------
 
   // create a point light.
-  var pointLight = new THREE.PointLight(0xFFFFF);
+  var pointLight = new THREE.PointLight(0xFFFFFF);
 
   // set its position.
   pointLight.position.x = 10;
   pointLight.position.y = 20;
   pointLight.position.z = 130;
-  
+
   // add the scene.
   scene.add(pointLight);
 }
@@ -113,7 +114,7 @@ function  initScene(){
 // The game timer (aka game loop). Called x times per second.
 function render(){
   // Render the scene.
-  renderer.render(scene. camera);
+  renderer.render(scene, camera);
 
   // Request the next frame.
   /* The "requestAnimationFrame()"" method tells the browser that
