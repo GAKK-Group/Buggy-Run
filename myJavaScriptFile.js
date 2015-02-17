@@ -7,8 +7,8 @@
 window.onload = init;
 
 // set the size of our canvas / view onto the scene.
-var WIDTH = 1280;
-var HEIGHT =  720;
+var WIDTH = 800;
+var HEIGHT =  600;
 
 // set camera properties / attributes.
 var VIEW_ANGLE = 45;
@@ -29,7 +29,7 @@ var cube;
 var rotationDuration = 5; 
 
 //used to determine the time between scene rendering
-var clock = new THREE.clock();
+var clock = new THREE.Clock();
 
 //stores the three.js controls
 var controls; 
@@ -76,7 +76,7 @@ docElement.appendChild( stats.domElement );
 
   // Set the position of the camera.
   // The camera starts at 0,0,0 ...so we move it back.
-  camera.position.set(0,0, 300);
+  camera.position.set(0,0, 30);
   
   // set up the camera controls
   controls = new THREE.FlyControls( camera );
@@ -145,6 +145,12 @@ cube = new THREE.Mesh(geometry, mapMaterial);
   // add to the scene
   scene.add(pointLight); 
   }
+  
+  function animate( deltaTime ) { 
+  var fract = deltaTime / rotationDuration; 
+  var angle = (Math.PI * 2) * fract; 
+  cube.rotation.y += angle; 
+  } 
   
 // The game timer (aka game loop). Called x times per second.
 function render(){
