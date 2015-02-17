@@ -7,8 +7,8 @@
 window.onload = init;
 
 // set the size of our canvas / view onto the scene.
-var WIDTH = 1280;
-var HEIGHT =  720;
+var WIDTH = 1320;
+var HEIGHT =  640;
 
 // set camera properties / attributes.
 var VIEW_ANGLE = 45;
