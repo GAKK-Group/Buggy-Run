@@ -7,8 +7,8 @@
 window.onload = init;
 
 // set the size of our canvas / view onto the scene.
-var WIDTH = 1320;
-var HEIGHT =  640;
+var WIDTH = window.innerWidth;
+var HEIGHT =  window.innerHeight;
 
 // set camera properties / attributes.
 var VIEW_ANGLE = 45;
@@ -22,17 +22,17 @@ var scene;
 var camera;
 
 //stats information for our scene.
-var stats; 
+var stats;
 
 // declare the variables for items in our scene.
 var cube;
-var rotationDuration = 5; 
+var rotationDuration = 5;
 
 //used to determine the time between scene rendering
 var clock = new THREE.Clock();
 
 //stores the three.js controls
-var controls; 
+var controls;
 
 // Initalise three.js
 function init() {
@@ -42,8 +42,13 @@ function init() {
   // create a WebGL renderer.
   renderer = new THREE.WebGLRenderer();
 
-  // Set the rednerer size.
-  renderer.setSize(WIDTH, HEIGHT);
+// Set the renderer size.
+renderer.setSize( window.innerWidth, window.innerHeight );
+  // Set the rednerer size for window rescale.
+window.addEventListener( 'resize', onWindowResize, false );
+function onWindowResize() {
+    renderer.setSize( window.innerWidth, window.innerHeight );
+}
 
   // Get element from the document ( our div) and append
   // the domElement (the canvas) to it.
@@ -52,15 +57,15 @@ function init() {
 
   // Set the dar colour.
   renderer.setClearColor(0xccccff);
-  
-  //Stats. 
+
+  //Stats.
   // ------
-stats = new Stats(); 
-stats.domElement.style.position = 'absolute'; 
+stats = new Stats();
+stats.domElement.style.position = 'absolute';
 stats.domElement.style.top = '0px';
-stats.domElement.style.zIndex = 100; 
-docElement.appendChild( stats.domElement ); 
- 
+stats.domElement.style.zIndex = 100;
+docElement.appendChild( stats.domElement );
+
   // Scene.
   // --------
 
@@ -77,16 +82,16 @@ docElement.appendChild( stats.domElement );
   // Set the position of the camera.
   // The camera starts at 0,0,0 ...so we move it back.
   camera.position.set(0,0, 30);
-  
+
   // set up the camera controls
   controls = new THREE.FlyControls( camera );
-  
-  controls.movementSpeed = 100; 
-  controls.domElement = docElement; 
+
+  controls.movementSpeed = 100;
+  controls.domElement = docElement;
   controls.rollSpeed = Math.PI / 12;
-	controls.autoForward = false; 
+	controls.autoForward = false;
 	// means the user has to click and drag to look with the mouse
-	controls.dragToLook = true; 
+	controls.dragToLook = true;
 
   // Start the scene.
   // --------------------
@@ -104,24 +109,24 @@ function  initScene(){
   // A simple mesh.
   // -------------------
   // Lets now create a simple mesh to put in our scene.
-// a textured cube 
+// a textured cube
 // -------------
 // first  create the texture map
-var textureMapURL = "images/face.jpg"; 
-var textureMap = THREE.ImageUtils.loadTexture(textureMapURL); 
+var textureMapURL = "images/face.jpg";
+var textureMap = THREE.ImageUtils.loadTexture(textureMapURL);
 
 // create a material and pass in the map
- var mapMaterial = new THREE.MeshBasicMaterial({ map: textureMap }); 
- 
+ var mapMaterial = new THREE.MeshBasicMaterial({ map: textureMap });
+
  // set up the box variables
- var height = 4; 
- var width = 4; 
- var depth = 4; 
- 
+ var height = 4;
+ var width = 4;
+ var depth = 4;
+
  // create the box geometry
- var geometry = new THREE.BoxGeometry(height, width, depth ); 
- 
-cube = new THREE.Mesh(geometry, mapMaterial); 
+ var geometry = new THREE.BoxGeometry(height, width, depth );
+
+cube = new THREE.Mesh(geometry, mapMaterial);
 
   // position the cube in from of the camera  and tilt it toward the viewer
   cube.position.x = 0;
@@ -130,42 +135,42 @@ cube = new THREE.Mesh(geometry, mapMaterial);
 
   // add the scene.
   scene.add(cube);
-  
-  //a basic light 
+
+  //a basic light
   // ------------
-  
-  // create a point light 
+
+  // create a point light
   var pointLight = new THREE.PointLight(0xFFFFFF);
-  
-  // set its position 
+
+  // set its position
   pointLight.position.x = 10;
   pointLight.position.y = 20;
-  pointLight.position.z = 130; 
-  
+  pointLight.position.z = 130;
+
   // add to the scene
-  scene.add(pointLight); 
+  scene.add(pointLight);
   }
-  
-  function animate( deltaTime ) { 
-  var fract = deltaTime / rotationDuration; 
-  var angle = (Math.PI * 2) * fract; 
-  cube.rotation.y += angle; 
-  } 
-  
+
+  function animate( deltaTime ) {
+  var fract = deltaTime / rotationDuration;
+  var angle = (Math.PI * 2) * fract;
+  cube.rotation.y += angle;
+  }
+
 // The game timer (aka game loop). Called x times per second.
 function render(){
 	var deltaTime = clock.getDelta();
 	//update the controls
 	controls.update( deltaTime );
-	
+
   // Render the scene.
   renderer.render(scene, camera);
 
   //Update the stats
-  stats.update(); 
-  
-  //rotate the cube 
-  animate ( deltaTime ); 
+  stats.update();
+
+  //rotate the cube
+  animate ( deltaTime );
   // Request the next frame.
   /* The "requestAnimationFrame()"" method tells the browser that
     you wish to perform an animation and request that browser call a specified
