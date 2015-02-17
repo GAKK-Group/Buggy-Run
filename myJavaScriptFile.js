@@ -107,7 +107,7 @@ function  initScene(){
 // a textured cube 
 // -------------
 // first  create the texture map
-var textureMapURL = "images/wlv-logo.jpg"; 
+var textureMapURL = "images/face.jpg"; 
 var textureMap = THREE.ImageUtils.loadTexture(textureMapURL); 
 
 // create a material and pass in the map
