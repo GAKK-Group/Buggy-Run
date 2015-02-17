@@ -47,7 +47,9 @@ renderer.setSize( window.innerWidth, window.innerHeight );
   // Set the rednerer size for window rescale.
 window.addEventListener( 'resize', onWindowResize, false );
 function onWindowResize() {
-    renderer.setSize( window.innerWidth, window.innerHeight );
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize( window.innerWidth, window.innerHeight );
 }
 
   // Get element from the document ( our div) and append
