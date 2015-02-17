@@ -77,6 +77,16 @@ docElement.appendChild( stats.domElement );
   // Set the position of the camera.
   // The camera starts at 0,0,0 ...so we move it back.
   camera.position.set(0,0, 300);
+  
+  // set up the camera controls
+  controls = new THREE.FlyControls( camera );
+  
+  controls.movementSpeed = 100; 
+  controls.domElement = docElement; 
+  controls.rollSpeed = Math.PI / 12;
+	controls.autoForward = false; 
+	// means the user has to click and drag to look with the mouse
+	controls.dragToLook = true; 
 
   // Start the scene.
   // --------------------
@@ -94,46 +104,62 @@ function  initScene(){
   // A simple mesh.
   // -------------------
   // Lets now create a simple mesh to put in our scene.
+// a textured cube 
+// -------------
+// first  create the texture map
+var textureMapURL = "images/wlv-logo.jpg"; 
+var textureMap = THREE.ImageUtils.loadTexture(textureMapURL); 
 
-  // set up the sphere variables.
-  var radius = 100;
-  var segments = 16;
-  var rings = 16;
+// create a material and pass in the map
+ var mapMaterial = new THREE.MeshBasicMaterial({ map: textureMap }); 
+ 
+ // set up the box variables
+ var height = 4; 
+ var width = 4; 
+ var depth = 4; 
+ 
+ // create the box geometry
+ var geometry = new THREE.BoxGeometry(height, width, depth ); 
+ 
+cube = new THREE.Mesh(geometry, mapMaterial); 
 
-  // The sphere material.
-  var sphereMaterial = new THREE.MeshLambertMaterial({
-    color: 0xff0000
-  });
-
-  // create a new mesh with sphere geometry.
-  sphere = new THREE.Mesh( new THREE.SphereGeometry(radius, segments, rings), sphereMaterial);
-
-  // Alther the position of the sphere. It's default position is 0,0,0.
-  sphere.position.y = 2;
-
-  // Add the spjere to the scene.
-  scene.add(sphere);
-
-  // A basic light.
-  // ----------------
-
-  // create a point light.
-  var pointLight = new THREE.PointLight(0xFFFFFF);
-
-  // set its position.
-  pointLight.position.x = 10;
-  pointLight.position.y = 20;
-  pointLight.position.z = 130;
+  // position the cube in from of the camera  and tilt it toward the viewer
+  cube.position.x = 0;
+  cube.position.y = 0;
+  cube.position.z = 0;
 
   // add the scene.
-  scene.add(pointLight);
-}
-
+  scene.add(cube);
+  
+  //a basic light 
+  // ------------
+  
+  // create a point light 
+  var pointLight = new THREE.PointLight(0xFFFFFF);
+  
+  // set its position 
+  pointLight.position.x = 10;
+  pointLight.position.y = 20;
+  pointLight.position.z = 130; 
+  
+  // add to the scene
+  scene.add(pointLight); 
+  }
+  
 // The game timer (aka game loop). Called x times per second.
 function render(){
+	var deltaTime = clock.getDelta();
+	//update the controls
+	controls.update( deltaTime );
+	
   // Render the scene.
   renderer.render(scene, camera);
 
+  //Update the stats
+  stats.update(); 
+  
+  //rotate the cube 
+  animate ( deltaTime ); 
   // Request the next frame.
   /* The "requestAnimationFrame()"" method tells the browser that
     you wish to perform an animation and request that browser call a specified
