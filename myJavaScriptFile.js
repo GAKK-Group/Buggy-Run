@@ -21,8 +21,18 @@ var renderer;
 var scene;
 var camera;
 
-// Decalre the variables for items in our sence.
-var sphere;
+//stats information for our scene.
+var stats; 
+
+// declare the variables for items in our scene.
+var cube;
+var rotationDuration = 5; 
+
+//used to determine the time between scene rendering
+var clock = new THREE.clock();
+
+//stores the three.js controls
+var controls; 
 
 // Initalise three.js
 function init() {
