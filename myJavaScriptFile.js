@@ -52,7 +52,15 @@ function init() {
 
   // Set the dar colour.
   renderer.setClearColor(0xccccff);
-
+  
+  //Stats. 
+  // ------
+stats = new Stats(); 
+stats.domElement.style.position = 'absolute'; 
+stats.domElement.style.top = '0px';
+stats.domElement.style.zIndex = 100; 
+docElement.appendChild( stats.domElement ); 
+ 
   // Scene.
   // --------
 
