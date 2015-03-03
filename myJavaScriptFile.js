@@ -134,7 +134,7 @@ function  initScene(){
 	// Lets now create a simple scene that contains land and sea.
 
 	// First lets create some sea.
-	var seaGeometry = new THREE.PlaneGeometry( 10000, 10000, 100, 100 );
+	/* var seaGeometry = new THREE.PlaneGeometry( 10000, 10000, 100, 100 );
 	seaGeometry.applyMatrix( new THREE.Matrix4().makeRotationX( - Math.PI / 2 ) );
 
 	// Next, create a material.
@@ -177,7 +177,7 @@ function  initScene(){
 
 	landMesh.position.y = -5;
 
-	scene.add( landMesh );
+	scene.add( landMesh ); */
 
 	// Basic lights.
 	// --------------
@@ -206,6 +206,29 @@ function  initScene(){
 
 			// Scale your model to the correct size.
 			myDaeFile.scale.x = myDaeFile.scale.y = myDaeFile.scale.z = 0.2;
+			myDaeFile.updateMatrix();
+
+			// Add the model to the scene.
+			scene.add( myDaeFile );
+		} );
+		
+		
+	// Add a model to the scene.
+	// -------------------------
+	myColladaLoader = new THREE.ColladaLoader();
+	myColladaLoader.options.convertUpAxis = true;
+
+	myColladaLoader.load( 'terrain.dae', function ( collada ) {
+			// Here we store the dae in a global variable.
+			myDaeFile = collada.scene;
+
+			// Position your model in the scene (world space).
+			myDaeFile.position.x = 0;
+			myDaeFile.position.y = 0;
+			myDaeFile.position.z = 0;
+
+			// Scale your model to the correct size.
+			myDaeFile.scale.x = myDaeFile.scale.y = myDaeFile.scale.z = 2;
 			myDaeFile.updateMatrix();
 
 			// Add the model to the scene.
