@@ -24,15 +24,28 @@ var camera;
 //stats information for our scene.
 var stats;
 
-// declare the variables for items in our scene.
-var cube;
-var rotationDuration = 5;
 
 //used to determine the time between scene rendering
 var clock = new THREE.Clock();
 
+// Handles the mouse events.
+var mouseOverCanvas;
+var mouseDown;
+
 //stores the three.js controls
 var controls;
+
+
+// Stores graphical meshes.
+var seaMesh;
+var landMesh;
+
+// Stores variables for Animation and 3D model.
+// Stores the model loader.
+var myColladaLoader;
+
+// Store the model.
+var myDaeFile;
 
 // Initalise three.js
 function init() {
@@ -108,59 +121,102 @@ docElement.appendChild( stats.domElement );
 
 // Initialise the scene
 function  initScene(){
+  
   // A simple mesh.
-  // -------------------
-  // Lets now create a simple mesh to put in our scene.
-// a textured cube
-// -------------
-// first  create the texture map
-var textureMapURL = "images/face.jpg";
-var textureMap = THREE.ImageUtils.loadTexture(textureMapURL);
+	// --------------
+	// Lets now create a simple scene that contains land and sea.
 
-// create a material and pass in the map
- var mapMaterial = new THREE.MeshBasicMaterial({ map: textureMap });
+	// First lets create some sea.
+	var seaGeometry = new THREE.PlaneGeometry( 10000, 10000, 100, 100 );
+	seaGeometry.applyMatrix( new THREE.Matrix4().makeRotationX( - Math.PI / 2 ) );
 
- // set up the box variables
- var height = 4;
- var width = 4;
- var depth = 4;
+	// Next, create a material.
+	var seaMaterial = new THREE.MeshBasicMaterial( {color: 0x1e90ff} );
 
- // create the box geometry
- var geometry = new THREE.BoxGeometry(height, width, depth );
+	// Then create the sea mesh and add to the scene.
+	seaMesh = new THREE.Mesh(seaGeometry, seaMaterial);
 
-cube = new THREE.Mesh(geometry, mapMaterial);
+	// Set the sea position.
+	seaMesh.position.y = -20;
 
-  // position the cube in from of the camera  and tilt it toward the viewer
-  cube.position.x = 0;
-  cube.position.y = 0;
-  cube.position.z = 0;
+	// Add the mesh to the scene.
+	scene.add( seaMesh );
 
-  // add the scene.
-  scene.add(cube);
+	// Next, create some land.
+	var landGeometry = new THREE.PlaneGeometry( 1500, 1500, 100, 100 );
+	landGeometry.applyMatrix( new THREE.Matrix4().makeRotationX( - Math.PI / 2 ) );
 
-  //a basic light
-  // ------------
+	// From example.
+	for ( var i = 0; i < landGeometry.vertices.length; i ++ ) {
+		var vertex = landGeometry.vertices[ i ];
+		vertex.x += Math.random() * 20 - 10;
+		vertex.y += Math.random() * 2;
+		vertex.z += Math.random() * 20 - 10;
+	}
 
-  // create a point light
-  var pointLight = new THREE.PointLight(0xFFFFFF);
+	for ( var i = 0; i < landGeometry.faces.length; i ++ ) {
+		var face = landGeometry.faces[ i ];
+		face.vertexColors[ 0 ] = 
+			new THREE.Color("rgb(0,255,0)").setHSL( Math.random() * 0.2 + 0.25, 0.75, 0.75 );
+		face.vertexColors[ 1 ] = 
+			new THREE.Color("rgb(0,255,0)").setHSL( Math.random() * 0.2 + 0.25, 0.75, 0.75 );
+		face.vertexColors[ 2 ] = 
+			new THREE.Color("rgb(0,255,0)").setHSL( Math.random() * 0.2 + 0.25, 0.75, 0.75 );
+	}
 
-  // set its position
-  pointLight.position.x = 10;
-  pointLight.position.y = 20;
-  pointLight.position.z = 130;
+	var landMaterial  = new THREE.MeshBasicMaterial( { vertexColors: THREE.VertexColors } );
 
-  // add to the scene
-  scene.add(pointLight);
-  }
+	landMesh = new THREE.Mesh( landGeometry, landMaterial );
 
-  function animate( deltaTime ) {
-  var fract = deltaTime / rotationDuration;
-  var angle = (Math.PI * 2) * fract;
-  cube.rotation.y += angle;
-  }
+	landMesh.position.y = -5;
+
+	scene.add( landMesh );
+
+	// Basic lights.
+	// --------------
+
+	var light = new THREE.DirectionalLight( 0xffffff, 1.5 );
+	light.position.set( 1, 1, 1 );
+	scene.add( light );
+
+	var light = new THREE.DirectionalLight( 0xffffff, 0.75 );
+	light.position.set( -1, - 0.5, -1 );
+	scene.add( light );
+
+	// Add a model to the scene.
+	// -------------------------
+	myColladaLoader = new THREE.ColladaLoader();
+	myColladaLoader.options.convertUpAxis = true;
+
+	myColladaLoader.load( 'car.dae', function ( collada ) {
+			// Here we store the dae in a global variable.
+			myDaeFile = collada.scene;
+
+			// Position your model in the scene (world space).
+			myDaeFile.position.x = 0;
+			myDaeFile.position.y = 5;
+			myDaeFile.position.z = 0;
+
+			// Scale your model to the correct size.
+			myDaeFile.scale.x = myDaeFile.scale.y = myDaeFile.scale.z = 0.2;
+			myDaeFile.updateMatrix();
+
+			// Add the model to the scene.
+			scene.add( myDaeFile );
+		} );
+}
+  
 
 // The game timer (aka game loop). Called x times per second.
 function render(){
+
+	// Here we control how the camera looks around the scene.
+	controls.activeLook = false;
+	if(mouseOverCanvas){
+		if(mouseDown){
+			controls.activeLook = true;
+		}
+	}
 	var deltaTime = clock.getDelta();
 	//update the controls
 	controls.update( deltaTime );
@@ -171,8 +227,6 @@ function render(){
   //Update the stats
   stats.update();
 
-  //rotate the cube
-  animate ( deltaTime );
   // Request the next frame.
   /* The "requestAnimationFrame()"" method tells the browser that
     you wish to perform an animation and request that browser call a specified
