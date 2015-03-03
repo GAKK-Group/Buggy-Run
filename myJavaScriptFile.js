@@ -23,20 +23,12 @@ var scene;
 //stats information for our scene.
 var stats;
 
-
 //used to determine the time between scene rendering
 var clock = new THREE.Clock();
 
 //Car Controls
 var keyboard;
 var angle;
-
-var controls;
-
-
-// Stores graphical meshes.
-var seaMesh;
-var landMesh;
 
 // Stores variables for Animation and 3D model.
 // Stores the model loader.
@@ -160,8 +152,7 @@ function  initScene(){
 
 			// Add the model to the scene.
 			scene.add( car );
-		} );
-		
+		} );		
 		
 	// Add a model to the scene.
 	// -------------------------
@@ -186,7 +177,6 @@ function  initScene(){
 		} );
 }
   
-
 // The game timer (aka game loop). Called x times per second.
 function render(){
 
