@@ -19,7 +19,6 @@ var FAR_CLIPPING_PLANE = 10000;
 // Declare the ariablss we will need for the three.js
 var renderer;
 var scene;
-var camera;
 
 //stats information for our scene.
 var stats;
@@ -28,11 +27,10 @@ var stats;
 //used to determine the time between scene rendering
 var clock = new THREE.Clock();
 
-// Handles the mouse events.
-var mouseOverCanvas;
-var mouseDown;
+//Car Controls
+var keyboard;
+var angle;
 
-//stores the three.js controls
 var controls;
 
 
@@ -45,7 +43,8 @@ var landMesh;
 var myColladaLoader;
 
 // Store the model.
-var myDaeFile;
+var car;
+var terrain;
 
 // Initalise three.js
 function init() {
@@ -103,17 +102,17 @@ docElement.appendChild( stats.domElement );
 
   // Set the position of the camera.
   // The camera starts at 0,0,0 ...so we move it back.
-  camera.position.set(0,0, 30);
+  camera.position.set(0,2, 30);
 
   // set up the camera controls
-  controls = new THREE.FlyControls( camera );
+  keyboard = new THREEx.KeyboardState();
 
-  controls.movementSpeed = 100;
+/*controls.movementSpeed = 100;
   controls.domElement = docElement;
   controls.rollSpeed = Math.PI / 12;
 	controls.autoForward = false;
 	// means the user has to click and drag to look with the mouse
-	controls.dragToLook = true;
+	controls.dragToLook = true;*/
 
   // Start the scene.
   // --------------------
@@ -128,56 +127,6 @@ docElement.appendChild( stats.domElement );
 
 // Initialise the scene
 function  initScene(){
-  
-  // A simple mesh.
-	// --------------
-	// Lets now create a simple scene that contains land and sea.
-
-	// First lets create some sea.
-	/* var seaGeometry = new THREE.PlaneGeometry( 10000, 10000, 100, 100 );
-	seaGeometry.applyMatrix( new THREE.Matrix4().makeRotationX( - Math.PI / 2 ) );
-
-	// Next, create a material.
-	var seaMaterial = new THREE.MeshBasicMaterial( {color: 0x1e90ff} );
-
-	// Then create the sea mesh and add to the scene.
-	seaMesh = new THREE.Mesh(seaGeometry, seaMaterial);
-
-	// Set the sea position.
-	seaMesh.position.y = -20;
-
-	// Add the mesh to the scene.
-	scene.add( seaMesh );
-
-	// Next, create some land.
-	var landGeometry = new THREE.PlaneGeometry( 1500, 1500, 100, 100 );
-	landGeometry.applyMatrix( new THREE.Matrix4().makeRotationX( - Math.PI / 2 ) );
-
-	// From example.
-	for ( var i = 0; i < landGeometry.vertices.length; i ++ ) {
-		var vertex = landGeometry.vertices[ i ];
-		vertex.x += Math.random() * 20 - 10;
-		vertex.y += Math.random() * 2;
-		vertex.z += Math.random() * 20 - 10;
-	}
-
-	for ( var i = 0; i < landGeometry.faces.length; i ++ ) {
-		var face = landGeometry.faces[ i ];
-		face.vertexColors[ 0 ] = 
-			new THREE.Color("rgb(0,255,0)").setHSL( Math.random() * 0.2 + 0.25, 0.75, 0.75 );
-		face.vertexColors[ 1 ] = 
-			new THREE.Color("rgb(0,255,0)").setHSL( Math.random() * 0.2 + 0.25, 0.75, 0.75 );
-		face.vertexColors[ 2 ] = 
-			new THREE.Color("rgb(0,255,0)").setHSL( Math.random() * 0.2 + 0.25, 0.75, 0.75 );
-	}
-
-	var landMaterial  = new THREE.MeshBasicMaterial( { vertexColors: THREE.VertexColors } );
-
-	landMesh = new THREE.Mesh( landGeometry, landMaterial );
-
-	landMesh.position.y = -5;
-
-	scene.add( landMesh ); */
 
 	// Basic lights.
 	// --------------
@@ -197,19 +146,20 @@ function  initScene(){
 
 	myColladaLoader.load( 'car.dae', function ( collada ) {
 			// Here we store the dae in a global variable.
-			myDaeFile = collada.scene;
+			car = collada.scene;
 
 			// Position your model in the scene (world space).
-			myDaeFile.position.x = 0;
-			myDaeFile.position.y = 5;
-			myDaeFile.position.z = 0;
+			car.position.x = 0;
+			car.position.y = 1.6;
+			car.position.z = 0;
+			car.rotation.set( -Math.PI * 0,-1.5,0);
 
 			// Scale your model to the correct size.
-			myDaeFile.scale.x = myDaeFile.scale.y = myDaeFile.scale.z = 0.2;
-			myDaeFile.updateMatrix();
+			car.scale.x = car.scale.y = car.scale.z = 0.1;
+			car.updateMatrix();
 
 			// Add the model to the scene.
-			scene.add( myDaeFile );
+			scene.add( car );
 		} );
 		
 		
@@ -220,19 +170,19 @@ function  initScene(){
 
 	myColladaLoader.load( 'terrain.dae', function ( collada ) {
 			// Here we store the dae in a global variable.
-			myDaeFile = collada.scene;
+			terrain = collada.scene;
 
 			// Position your model in the scene (world space).
-			myDaeFile.position.x = 0;
-			myDaeFile.position.y = 0;
-			myDaeFile.position.z = 0;
+			terrain.position.x = 0;
+			terrain.position.y = 0;
+			terrain.position.z = 0;
 
 			// Scale your model to the correct size.
-			myDaeFile.scale.x = myDaeFile.scale.y = myDaeFile.scale.z = 2;
-			myDaeFile.updateMatrix();
+			terrain.scale.x = terrain.scale.y = terrain.scale.z = 3;
+			terrain.updateMatrix();
 
 			// Add the model to the scene.
-			scene.add( myDaeFile );
+			scene.add( terrain );
 		} );
 }
   
@@ -241,15 +191,26 @@ function  initScene(){
 function render(){
 
 	// Here we control how the camera looks around the scene.
-	controls.activeLook = false;
-	if(mouseOverCanvas){
-		if(mouseDown){
-			controls.activeLook = true;
-		}
+	if(keyboard.pressed("a")) {
+		car.rotation.y += 0.1;
+		angle += 0.1;
+	}
+	if (keyboard.pressed("d")) {
+		car.rotation.y -= 0.1
+		angle -= 0.1;
+	}
+	if(keyboard.pressed("w")) {
+		car.position.z-= 1.0;
+		/*car.position.z -= Math.sin(-angle);     
+		car.position.x -= Math.cos(-angle);*/	
+	}
+	if(keyboard.pressed("s")){
+		car.position.z += 1.0;
+		/*car.position.z += Math.sin(-angle);     
+		car.position.x += Math.cos(-angle);*/
 	}
 	var deltaTime = clock.getDelta();
 	//update the controls
-	controls.update( deltaTime );
 
   // Render the scene.
   renderer.render(scene, camera);
