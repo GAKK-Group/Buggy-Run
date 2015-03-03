@@ -73,6 +73,13 @@ function onWindowResize() {
   // Set the dar colour.
   renderer.setClearColor(0xccccff);
 
+  // Add an event to set if the mouse is over our canvas.
+	renderer.domElement.onmouseover=function(e){ mouseOverCanvas = true; }
+	renderer.domElement.onmousemove=function(e){ mouseovercanvas = true; }
+	renderer.domElement.onmouseout=function(e){ mouseOverCanvas = false; }
+
+	renderer.domElement.onmousedown=function(e){ mouseDown = true; }
+	renderer.domElement.onmouseup=function(e){ mouseDown = false; }
   //Stats.
   // ------
 stats = new Stats();
