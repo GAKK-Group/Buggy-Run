@@ -19,6 +19,7 @@ var FAR_CLIPPING_PLANE = 10000;
 // Declare the ariablss we will need for the three.js
 var renderer;
 var scene;
+var camera;
 
 //stats information for our scene.
 var stats;
@@ -94,7 +95,8 @@ docElement.appendChild( stats.domElement );
 
   // Set the position of the camera.
   // The camera starts at 0,0,0 ...so we move it back.
-  camera.position.set(0,2, 30);
+  camera.position.set(0,700,30);
+  camera.rotation.x = -90  * Math.PI / 180;
 
   // set up the camera controls
   keyboard = new THREEx.KeyboardState();
@@ -152,8 +154,8 @@ function  initScene(){
 
 			// Add the model to the scene.
 			scene.add( car );
-		} );		
-		
+		} );
+
 	// Add a model to the scene.
 	// -------------------------
 	myColladaLoader = new THREE.ColladaLoader();
@@ -176,7 +178,7 @@ function  initScene(){
 			scene.add( terrain );
 		} );
 }
-  
+
 // The game timer (aka game loop). Called x times per second.
 function render(){
 
@@ -190,14 +192,14 @@ function render(){
 		angle -= 0.1;
 	}
 	if(keyboard.pressed("w")) {
-		car.position.z-= 1.0;
-		/*car.position.z -= Math.sin(-angle);     
-		car.position.x -= Math.cos(-angle);*/	
+		//car.position.z-= 1.0;
+		car.position.z -= Math.sin(-angle);
+		car.position.x -= Math.cos(-angle);
 	}
 	if(keyboard.pressed("s")){
-		car.position.z += 1.0;
-		/*car.position.z += Math.sin(-angle);     
-		car.position.x += Math.cos(-angle);*/
+		//car.position.z += 1.0;
+		car.position.z += Math.sin(-angle);
+		car.position.x += Math.cos(-angle);
 	}
 	var deltaTime = clock.getDelta();
 	//update the controls
