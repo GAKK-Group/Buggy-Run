@@ -121,7 +121,12 @@ function  initScene(){
 			car.updateMatrix();
 
 			// Add the model to the scene.
-			scene.add( car );
+			scene.add( car )
+
+      car.add(camera);
+      camera.position.set(300,80,0); //3RD stays 0 
+      camera.rotation.y = 90 * Math.PI / 180;
+      camera.rotation.x =  0 * Math.PI / 180;
 		} );
 
 	// Add a model to the scene.
@@ -145,6 +150,7 @@ function  initScene(){
 			// Add the model to the scene.
 			scene.add( terrain );
 		} );
+
 }
 
 // The game timer (aka game loop). Called x times per second.
@@ -168,14 +174,6 @@ function render(){
   if ( keyboard.pressed("D") ) {
     car.rotateOnAxis( new THREE.Vector3(0,1,0), -rotateAngle);
   }
-
-
-    /*var relativeCameraOffset = new THREE.Vector3(0,50,200);
-    var cameraOffset = relativeCameraOffset.applyMatrix4( car.matrixWorld);
-    camera.position.x = cameraOffset.x;
-    camera.position.y = cameraOffset.y;
-    camera.position.z = cameraOffset.z;
-    camera.lookAt( car.position );*/
 
   // Render the scene.
   renderer.render(scene, camera);
