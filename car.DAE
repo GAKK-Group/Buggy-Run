@@ -6,8 +6,8 @@
       <authoring_tool>OpenCOLLADA for 3ds Max;  ;  </authoring_tool>
       <source_data>file:///E:/car%20game/car%20model.max</source_data>
     </contributor>
-    <created>2015-03-05T12:09:17</created>
-    <modified>2015-03-05T12:09:17</modified>
+    <created>2015-03-05T12:16:19</created>
+    <modified>2015-03-05T12:16:19</modified>
     <unit name="inch" meter="0.0254"/>
     <up_axis>Z_UP</up_axis>
   </asset>
