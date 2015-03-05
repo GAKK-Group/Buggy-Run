@@ -17,27 +17,11 @@ var NEAR_CLIPPING_PLANE = 0.1;
 var FAR_CLIPPING_PLANE = 10000;
 
 // Declare the ariablss we will need for the three.js
-var renderer;
-var scene;
-var camera;
-
-//stats information for our scene.
-var stats;
+var renderer, scene, camera, stats, keyboard, myColladaLoader, car, terrain;
 
 //used to determine the time between scene rendering
 var clock = new THREE.Clock();
-
-//Car Controls
-var keyboard;
-var angle;
-
-// Stores variables for Animation and 3D model.
-// Stores the model loader.
-var myColladaLoader;
-
-// Store the model.
-var car;
-var terrain;
+var keyboard = new THREEx .KeyboardState();
 
 // Initalise three.js
 function init() {
@@ -48,14 +32,14 @@ function init() {
   renderer = new THREE.WebGLRenderer();
 
 // Set the renderer size.
-renderer.setSize( window.innerWidth, window.innerHeight );
-  // Set the rednerer size for window rescale.
-window.addEventListener( 'resize', onWindowResize, false );
-function onWindowResize() {
-  camera.aspect = window.innerWidth / window.innerHeight;
-  camera.updateProjectionMatrix();
   renderer.setSize( window.innerWidth, window.innerHeight );
-}
+  // Set the rednerer size for window rescale.
+  window.addEventListener( 'resize', onWindowResize, false );
+  function onWindowResize() {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize( window.innerWidth, window.innerHeight );
+  }
 
   // Get element from the document ( our div) and append
   // the domElement (the canvas) to it.
@@ -65,13 +49,6 @@ function onWindowResize() {
   // Set the dar colour.
   renderer.setClearColor(0xccccff);
 
-  // Add an event to set if the mouse is over our canvas.
-	renderer.domElement.onmouseover=function(e){ mouseOverCanvas = true; }
-	renderer.domElement.onmousemove=function(e){ mouseovercanvas = true; }
-	renderer.domElement.onmouseout=function(e){ mouseOverCanvas = false; }
-
-	renderer.domElement.onmousedown=function(e){ mouseDown = true; }
-	renderer.domElement.onmouseup=function(e){ mouseDown = false; }
   //Stats.
   // ------
 stats = new Stats();
@@ -95,18 +72,9 @@ docElement.appendChild( stats.domElement );
 
   // Set the position of the camera.
   // The camera starts at 0,0,0 ...so we move it back.
-  camera.position.set(0,700,30);
-  camera.rotation.x = -90  * Math.PI / 180;
-
-  // set up the camera controls
-  keyboard = new THREEx.KeyboardState();
-
-/*controls.movementSpeed = 100;
-  controls.domElement = docElement;
-  controls.rollSpeed = Math.PI / 12;
-	controls.autoForward = false;
-	// means the user has to click and drag to look with the mouse
-	controls.dragToLook = true;*/
+  scene.add(camera);
+  camera.position.set(0,20,50);
+  camera.lookAt(scene.position);
 
   // Start the scene.
   // --------------------
@@ -183,26 +151,31 @@ function  initScene(){
 function render(){
 
 	// Here we control how the camera looks around the scene.
-	if(keyboard.pressed("a")) {
-		car.rotation.y += 0.1;
-		angle += 0.1;
-	}
-	if (keyboard.pressed("d")) {
-		car.rotation.y -= 0.1
-		angle -= 0.1;
-	}
-	if(keyboard.pressed("w")) {
-		//car.position.z-= 1.0;
-		car.position.z -= Math.sin(-angle);
-		car.position.x -= Math.cos(-angle);
-	}
-	if(keyboard.pressed("s")){
-		//car.position.z += 1.0;
-		car.position.z += Math.sin(-angle);
-		car.position.x += Math.cos(-angle);
-	}
-	var deltaTime = clock.getDelta();
-	//update the controls
+  var deltaTime = clock.getDelta();
+  var moveDistance = 30 * deltaTime;
+  var rotateAngle = Math.PI / 2 * deltaTime;
+  var rotation_matrix = new THREE.Matrix4().identity();
+
+  if ( keyboard.pressed("W") ) {
+    car.translateX( -moveDistance );
+  }
+  if ( keyboard.pressed("S") ) {
+    car.translateX(  moveDistance );
+  }
+  if ( keyboard.pressed("A") ) {
+    car.rotateOnAxis( new THREE.Vector3(0,1,0), rotateAngle);
+  }
+  if ( keyboard.pressed("D") ) {
+    car.rotateOnAxis( new THREE.Vector3(0,1,0), -rotateAngle);
+  }
+
+
+    /*var relativeCameraOffset = new THREE.Vector3(0,50,200);
+    var cameraOffset = relativeCameraOffset.applyMatrix4( car.matrixWorld);
+    camera.position.x = cameraOffset.x;
+    camera.position.y = cameraOffset.y;
+    camera.position.z = cameraOffset.z;
+    camera.lookAt( car.position );*/
 
   // Render the scene.
   renderer.render(scene, camera);
