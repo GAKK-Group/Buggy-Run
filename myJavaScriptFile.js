@@ -17,7 +17,15 @@ var NEAR_CLIPPING_PLANE = 0.1;
 var FAR_CLIPPING_PLANE = 10000;
 
 // Declare the ariablss we will need for the three.js
-var renderer, scene, camera, stats, keyboard, myColladaLoader, car, terrain;
+var renderer, scene, camera, stats, keyboard, myColladaLoader, car, terrain, raycaster;
+
+
+
+var objects = [];
+
+var canJump = false;
+var yVelocity = 0 ;
+var yAcceleration = 2.0;
 
 //used to determine the time between scene rendering
 var clock = new THREE.Clock();
@@ -49,6 +57,16 @@ function init() {
   // Set the dar colour.
   renderer.setClearColor(0xccccff);
 
+  docElement.onkeydown=function(e){
+    switch (e.keyCode){
+      case 32:
+        if (canJump){
+          yVelocity = 2.5;
+          canJump = false;
+        }
+    }
+  }
+
   //Stats.
   // ------
 stats = new Stats();
@@ -75,6 +93,8 @@ docElement.appendChild( stats.domElement );
   scene.add(camera);
   camera.position.set(0,20,50);
   camera.lookAt(scene.position);
+
+  raycaster = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3( 0,  - 1, 0 ), 0, 10);
 
   // Start the scene.
   // --------------------
@@ -106,7 +126,7 @@ function  initScene(){
 	myColladaLoader = new THREE.ColladaLoader();
 	myColladaLoader.options.convertUpAxis = true;
 
-	myColladaLoader.load( 'car.dae', function ( collada ) {
+	myColladaLoader.load( 'car.DAE', function ( collada ) {
 			// Here we store the dae in a global variable.
 			car = collada.scene;
 
@@ -121,10 +141,11 @@ function  initScene(){
 			car.updateMatrix();
 
 			// Add the model to the scene.
-			scene.add( car )
+			scene.add( car );
+      objects.push( car );
 
       car.add(camera);
-      camera.position.set(300,80,0); //3RD stays 0 
+      camera.position.set(300,80,0); //3RD stays 0
       camera.rotation.y = 90 * Math.PI / 180;
       camera.rotation.x =  0 * Math.PI / 180;
 		} );
@@ -134,7 +155,7 @@ function  initScene(){
 	myColladaLoader = new THREE.ColladaLoader();
 	myColladaLoader.options.convertUpAxis = true;
 
-	myColladaLoader.load( 'terrain.dae', function ( collada ) {
+	myColladaLoader.load( 'terrain.DAE', function ( collada ) {
 			// Here we store the dae in a global variable.
 			terrain = collada.scene;
 
@@ -149,6 +170,7 @@ function  initScene(){
 
 			// Add the model to the scene.
 			scene.add( terrain );
+      objects.push( terrain );
 		} );
 
 }
@@ -173,6 +195,27 @@ function render(){
   }
   if ( keyboard.pressed("D") ) {
     car.rotateOnAxis( new THREE.Vector3(0,1,0), -rotateAngle);
+  }
+
+  var tmpY = camera.position.y;
+
+  camera.position.y = tmpY;
+
+  raycaster.ray.origin.copy( camera.position );
+  raycaster.ray.origin.y -= 5;
+  var intersections = raycaster.intersectObjects( objects );
+
+  document.getElementById("debugInfo").innerHTML = "Debug Info: <br>" + "<br>camera.position.y = " + camera.position.y
+    + ".<br>" + "<br>intersections.length = " + intersections.length + ".<br>" + "<br>yVelocity = " + yVelocity + ".<br>";
+
+  if ( intersections.length > 0 ) {
+    if(camera.postion.y < tmpY){
+      camera.position.y = tmpY;
+      canJump = true;
+      yVelocity = 0.0;
+    }
+  } else {
+    canJump = false;
   }
 
   // Render the scene.
