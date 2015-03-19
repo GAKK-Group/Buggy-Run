@@ -16,13 +16,14 @@ var ASPECT_RATIO = WIDTH / HEIGHT;
 var NEAR_CLIPPING_PLANE = 0.1;
 var FAR_CLIPPING_PLANE = 10000;
 
-// Declare the ariablss we will need for the three.js
+// Declare the variables we will need for the three.js
 var renderer, scene, camera, stats, keyboard, myColladaLoader, car, terrain, raycaster;
 
 
-
+//Objects in current scene nested here
 var objects = [];
 
+//Set Jump Variables
 var canJump = false;
 var yVelocity = 0 ;
 var yAcceleration = 2.0;
@@ -57,9 +58,10 @@ function init() {
   // Set the dar colour.
   renderer.setClearColor(0xccccff);
 
+  //Jump on keydown
   docElement.onkeydown=function(e){
     switch (e.keyCode){
-      case 32:
+      case 32: //Spacebar
         if (canJump){
           yVelocity = 2.5;
           canJump = false;
@@ -94,6 +96,8 @@ docElement.appendChild( stats.domElement );
   camera.position.set(0,20,50);
   camera.lookAt(scene.position);
 
+
+  //RayCaster (Collisions)
   raycaster = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3( 0,  - 1, 0 ), 0, 10);
 
   // Start the scene.
@@ -178,7 +182,7 @@ function  initScene(){
 // The game timer (aka game loop). Called x times per second.
 function render(){
 
-	// Here we control how the camera looks around the scene.
+	// Car Controlls
   var deltaTime = clock.getDelta();
   var moveDistance = 30 * deltaTime;
   var rotateAngle = Math.PI / 2 * deltaTime;
@@ -197,17 +201,21 @@ function render(){
     car.rotateOnAxis( new THREE.Vector3(0,1,0), -rotateAngle);
   }
 
+  //Camera current position
   var tmpY = camera.position.y;
-
   camera.position.y = tmpY;
 
+  //Camera Gravity
   raycaster.ray.origin.copy( camera.position );
   raycaster.ray.origin.y -= 5;
   var intersections = raycaster.intersectObjects( objects );
 
-  document.getElementById("debugInfo").innerHTML = "Debug Info: <br>" + "<br>camera.position.y = " + camera.position.y
-    + ".<br>" + "<br>intersections.length = " + intersections.length + ".<br>" + "<br>yVelocity = " + yVelocity + ".<br>";
 
+  //Debug Output source
+  document.getElementById("debugInfo").innerHTML = "Debug Info: <br>" + "camera.position.y = " + camera.position.y
+    + ".<br>" + "intersections.length = " + intersections.length + ".<br>" + "yVelocity = " + yVelocity + ".<br>";
+
+  //Gravity and Collision detection.
   if ( intersections.length > 0 ) {
     if(camera.postion.y < tmpY){
       camera.position.y = tmpY;
