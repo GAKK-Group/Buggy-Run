@@ -32,6 +32,7 @@ var mouseDown;
 var keyboard;
 
 var raycaster;
+var raycasterf;
 
 var objects = [];
 
@@ -47,6 +48,11 @@ var car;
 var terrain;
 var ring;
 
+var ringAnimations;
+var keyFrameAnimations = [];
+var keyFrameAnimationsLength = 0;
+var lastFrameCurrentTime = [];
+
 var projector;
 
 var skyBoxMesh;
@@ -61,26 +67,6 @@ function init() {
   docElement.appendChild(renderer.domElement);
 
   renderer.setClearColor("rgb(135,206,250)");
-
-  renderer.domElement.onmouseover=function(e) { mouseOverCanvas = true; }
-  renderer.domElement.onmousemove=function(e) { mouseOverCanvas = true; }
-  renderer.domElement.onmouseout=function(e) { mouseOverCanvas = false; }
-
-  renderer.domElement.onmousedown=function(e) { mouseDown = true; }
-  renderer.domElement.onmouseup=function(e) { mouseDown = false; }
-
-  renderer.domElement.ondbclick=onDoubleClick;
-
-  docElement.onkeydown=function(e) {
-    switch (e.keyCode ) {
-      case 32:
-        if(canJump){
-          yVelocity= 2.5;
-          canJump = false;
-        }
-    }
-  }
-
 
   renderer.setSize( window.innerWidth, window.innerHeight );
   // Set the rednerer size for window rescale.
@@ -109,52 +95,15 @@ function init() {
   raycaster = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3( 0 ,-1, 0), 0, 10);
 
 
+
   initScene();
+
 
   render();
 }
 
 
 function initScene() {
-
-  var seaGeometry = new THREE.PlaneGeometry( 10000, 10000, 100, 100 );
-  seaGeometry.applyMatrix( new THREE.Matrix4().makeRotationX(  -Math.PI  / 2) );
-
-  var seaMaterial = new THREE.MeshBasicMaterial( {color: 0x1e90ff} );
-
-  seaMesh = new THREE.Mesh(seaGeometry, seaMaterial);
-
-  seaMesh.position.y = -10;
-
-  seaMesh.name = "sea";
-  scene.add( seaMesh );
-  objects.push( seaMesh );
-
-  /*var landGeometry = new THREE.PlaneGeometry( 1500, 1500, 100, 100 );
-  landGeometry.applyMatrix( new THREE.Matrix4().makeRotationX( -Math.PI / 2 ) );
-
-  for (var i = 0; i < landGeometry.vertices.length; i ++) {
-    var vertex = landGeometry.vertices[ i ];
-    vertex.x +=Math.random() * 20 - 10;
-    vertex.y += Math.random() * 2;
-    vertex.z += Math.random() * 20 - 10;
-  }
-
-  for (var i = 0; i < landGeometry.faces.length; i ++) {
-    var face = landGeometry.faces[ i ];
-    face.vertexColors[ 0 ] = new THREE.Color("rgb(0,255,0)").setHSL (Math.random() * 0.2 + 0.25, 0.75, 0.75);
-    face.vertexColors[ 1 ] = new THREE.Color("rgb(0,255,0)").setHSL (Math.random() * 0.2 + 0.25, 0.75, 0.75);
-    face.vertexColors[ 2 ] = new THREE.Color("rgb(0,255,0)").setHSL (Math.random() * 0.2 + 0.25, 0.75, 0.75);
-  }
-
-  var landMaterial = new THREE.MeshBasicMaterial( {vertexColors: THREE.VertexColors} );
-  landMesh = new THREE.Mesh( landGeometry, landMaterial );
-
-  landMesh.position.y = -10;
-
-  landMesh.name = "land";
-  scene.add( landMesh );
-  objects.push( landMesh );*/
 
   texture_placeholder = document.createElement( 'canvas' );
   texture_placeholder.width = 128;
@@ -191,12 +140,30 @@ scene.add(skyBoxMesh);
   myColladaLoader = new THREE.ColladaLoader();
   myColladaLoader.options.convertUpAxis = true;
 
-	myColladaLoader.load( 'ringnew.DAE', function ( collada ) {
+	var ring = myColladaLoader.load( 'ringanimated.DAE', function ( collada ) {
 			// Here we store the dae in a global variable.
 			ring = collada.scene;
 
+      ringAnimations = collada.animations;
+
+      keyFrameAnimationsLength = ringAnimations.length;
+
+      for ( var i = 0; i < keyFrameAnimationsLength; i++ ) {
+        lastFrameCurrentTime[i];
+      }
+
+      for ( var i = 0; i < keyFrameAnimationsLength; i++ ) {
+        var animation = ringAnimations[ i ];
+
+        var keyFrameAnimation = new THREE.KeyFrameAnimation( animation );
+        keyFrameAnimation.timeScale = 1;
+        keyFrameAnimation.loop = false;
+
+        keyFrameAnimations.push( keyFrameAnimation );
+      }
+
 			// Position your model in the scene (world space).objects
-      ring.position.set(-3,-0.8,20);
+      ring.position.set(0,-1.5,20);
       ring.rotation.y = 4.6;
 			// Scale your model to the correct size.
       ring.scale.x = ring.scale.y = ring.scale.z = 0.03;
@@ -207,16 +174,17 @@ scene.add(skyBoxMesh);
       ring.name = "ring";
 			scene.add(ring);
       objects.push(ring);
+
 		} );
 
 
-    myColladaLoader.load( 'terrain4.DAE', function ( collada ) {
+    myColladaLoader.load( 'TerrainAza (2).DAE', function ( collada ) {
         // Here we store the dae in a global variable.
         terrain = collada.scene;
 
         // Position your model in the scene (world space).
         terrain.position.x = 0;
-        terrain.position.y = -1;
+        terrain.position.y = 11;
         terrain.position.z = 0;
 
         // Scale your model to the correct size.
@@ -224,78 +192,71 @@ scene.add(skyBoxMesh);
         terrain.updateMatrix();
 
         // Add the model to the scene.
+        terrain.name = "terrain";
         scene.add(terrain);
         objects.push(terrain);
+
+        startAnimations();
       } );
 
 }
 
-function onDoubleClick( event ) {
-  mouseDown = false;
-
-  var canvasLeft = 10;
-  var canvasTop = 10;
-
-  var tempX = event.clientX - canvasLeft;
-  var tempY = event.clientY - canvasTop;
-
-  var vector = new THREE.Vecotr3( ( tempX / WIDTH) * 2 - 1, - ( tempY / HEIGHT) * + 1, 0.5);
-
-  projector.unprojectVecotr( vector, camera);
-
-  var raycaster = new THREE.Raycaster( camera.position, vector.sub(camera.position).normalize());
-
-  var intersects = raycaster.intersectObjects( objects, true);
-
-  if (interscets.length > 0) {
-    var tempStr = "Number of items: " + intersects.length + " ";
-
-    for(var i = 0;  i < intersects.length; i++) {
-      if(intersects[ i ].object.name != " ") {
-        tempStr += " | Name: " + intersects[ i ].object.name;
-      } else {
-        tempStr += " | Name: " + intersects[ i ].object.parent.id;
-      }
-    }
-    document.getElementById("debugInfo2").innerHTML = tempStr + ".<br>";
+function startAnimations() {
+  for ( var i = 0; i < keyFrameAnimationsLength; i++)  {
+    var animation = keyFrameAnimations[i];
+    animation.play();
   }
 }
 
 
+function loopAnimations() {
+  for ( var i = 0; i < keyFrameAnimationsLength; i ++ ) {
+    if(keyFrameAnimations[i].isPlaying && !keyFrameAnimations[i].isPaused) {
+      if(keyFrameAnimations[i].currentTime == lastFrameCurrentTime[i]) {
+        keyFrameAnimations[i].stop();
+        keyFrameAnimations[i].play();
+        lastFrameCurrentTime[i] = 0;
+      }
+    }
+  }
+}
+
 function render() {
-
-
 
   var deltaTime = clock.getDelta();
 
+  THREE.AnimationHandler.update( deltaTime );
+  loopAnimations();
+
   var tmpY = camera.position.y;
 
+  var matrix = new THREE.Matrix4();
+  matrix.extractRotation( camera.matrix );
 
+  //raycasterf = new THREE.Raycaster( camera.position,0,50);
+  //raycasterf.ray.origin.copy( camera.position );
+  //raycasterf.ray.origin.x = 1;
+  //var intersections = raycasterf.intersectObjects(objects,true);
 
   camera.position.y = tmpY;
 
   raycaster.ray.origin.copy( camera.position );
   raycaster.ray.y = -5;
-  var intersections = raycaster.intersectObjects( objects );
+  var intersections = raycaster.intersectObjects( objects, true );
 
   yVelocity = yVelocity  - yAcceleration * deltaTime;
 
   camera.position.y = camera.position.y = yVelocity;
 
-  document.getElementById("debugInfo").innerHTML = "Debug Info: <br>" + "camera.position.y = " + camera.position.y
-    + ".<br>" + "intersections.length = " + intersections.length + ".<br>" + "yVelocity = " + yVelocity + ".<br>";
+  document.getElementById("debugInfo").innerHTML =  "intersections.length = " + intersections.length;
 
     if ( intersections.length > 0) {
       if(camera.position.y < tmpY) {
         camera.position.y = tmpY;
-        canJump = true;
-        yVelocity = 0.0;
       }
-    } else {
-      canJump = false;
     }
 
-    var moveDistance = 10 * deltaTime;
+    var moveDistance = 20 * deltaTime;
     var rotateAngle = Math.PI / 2 * deltaTime;
     var rotation_matrix = new THREE.Matrix4().identity();
 
@@ -312,14 +273,18 @@ function render() {
       camera.rotateOnAxis( new THREE.Vector3(0,1,0), -rotateAngle);
     }
 
+
+
   renderer.render(scene, camera);
 
   stats.update();
 
   requestAnimationFrame(render);
+
+  for ( var i = 0; i < keyFrameAnimationsLength; i++ ) {
+    lastFrameCurrentTime[i] = keyFrameAnimations[i].currentTime;
+  }
 }
-
-
 function loadTexture( path ) {
   var texture = new THREE.Texture( texture_placeholder );
   var material = new THREE.MeshBasicMaterial( {map: texture, overdraw: 0.5 });
