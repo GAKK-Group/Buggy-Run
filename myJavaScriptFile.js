@@ -29,7 +29,8 @@ var keyboard = new THREEx .KeyboardState();
 var keyboard;
 
 var raycaster;
-var raycasterf;
+var raycasterF;
+var raycasterB;
 
 var objects = [];
 
@@ -223,10 +224,16 @@ function render() {
   var matrix = new THREE.Matrix4();
   matrix.extractRotation( camera.matrix );
 
-  //raycasterf = new THREE.Raycaster( camera.position,0,50);
-  //raycasterf.ray.origin.copy( camera.position );
-  //raycasterf.ray.origin.x = 1;
-  //var intersections = raycasterf.intersectObjects(objects,true);
+  var direction = new THREE.Vector3( 0,0,-1);
+  direction = direction.applyMatrix4(matrix);
+
+  var directionB = new THREE.Vector3(0,0,-1).negate();
+  directionB = directionB.applyMatrix4(matrix);
+
+  raycasterFC = new THREE.Raycaster( camera.position,direction,0,2);
+  var intersectionsF = raycasterFC.intersectObjects( objects, true);
+  raycasterBC = new THREE.Raycaster( camera.position, directionB,0,2);
+  var intersectionsB = raycasterBC.intersectObjects( objects, true);
 
   camera.position.y = tmpY;
 
@@ -238,7 +245,9 @@ function render() {
 
   camera.position.y = camera.position.y = yVelocity;
 
-  document.getElementById("debugInfo").innerHTML =  "intersections.length = " + intersections.length;
+  document.getElementById("debugInfo").innerHTML =  "intersections.length = " + intersections.length +
+    "<br>" +"intersectionsF.length = " + intersectionsF.length +
+    "<br>" + "intersectionsB.length = " + intersectionsB.length;
 
     if ( intersections.length > 0) {
       if(camera.position.y < tmpY) {
@@ -251,10 +260,18 @@ function render() {
     var rotation_matrix = new THREE.Matrix4().identity();
 
     if ( keyboard.pressed("W") ) {
+      if (intersectionsF.length > 0) {
+        moveDistance = 0;
+      } else {
       camera.translateZ( -moveDistance );
+      }
     }
     if ( keyboard.pressed("S") ) {
+      if (intersectionsB.length > 0) {
+        moveDistance = 0;
+      } else {
       camera.translateZ(  moveDistance );
+      }
     }
     if ( keyboard.pressed("A") ) {
       camera.rotateOnAxis( new THREE.Vector3(0,1,0), rotateAngle);
