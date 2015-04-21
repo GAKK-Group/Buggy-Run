@@ -1,6 +1,4 @@
 // myJavaScriptFile.js
-// Version: 3.0.
-// This exampe renders a simple sphere.
 
 // Set the initialise function to be called
 // when the page has loaded.
@@ -124,9 +122,9 @@ scene.add(skyBoxMesh);
   light.position.set( 1, 1, 1 );
   scene.add( light );
 
-  var light2 = new THREE.DirectionalLight( 0xffffff, 0.75);
+  /*var light2 = new THREE.DirectionalLight( 0xffffff, 0.75);
   light2.position.set( -1, - 0.5, -1 );
-  scene.add( light2 );
+  scene.add( light2 );*/
 
   myColladaLoader = new THREE.ColladaLoader();
   myColladaLoader.options.convertUpAxis = true;
@@ -238,7 +236,7 @@ function render() {
   camera.position.y = tmpY;
 
   raycaster.ray.origin.copy( camera.position );
-  raycaster.ray.y = -5;
+  raycaster.ray.y -= 1;
   var intersections = raycaster.intersectObjects( objects, true );
 
   yVelocity = yVelocity  - yAcceleration * deltaTime;
