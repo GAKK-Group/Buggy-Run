@@ -26,9 +26,6 @@ var stats;
 var clock = new THREE.Clock();
 var keyboard = new THREEx .KeyboardState();
 
-var mouseOverCanvas;
-var mouseDown;
-
 var keyboard;
 
 var raycaster;
@@ -36,15 +33,10 @@ var raycasterf;
 
 var objects = [];
 
-var canJump = false;
 var yVelocity = 0;
 var yAcceleration = 2.0;
 
-var seaMesh;
-var landMesh;
-
 var myColladaLoader;
-var car;
 var terrain;
 var ring;
 
@@ -52,8 +44,6 @@ var ringAnimations;
 var keyFrameAnimations = [];
 var keyFrameAnimationsLength = 0;
 var lastFrameCurrentTime = [];
-
-var projector;
 
 var skyBoxMesh;
 var texture_placeholder;
@@ -90,7 +80,7 @@ function init() {
   camera = new THREE.PerspectiveCamera(VIEW_ANGLE, ASPECT_RATIO, NEAR_CLIPPING_PLANE, FAR_CLIPPING_PLANE);
 
   scene.add(camera);
-  camera.position.set(0,0,30);
+  camera.position.set(-4,0,30);
   camera.lookAt(scene.position);
 
 
@@ -133,8 +123,6 @@ scene.add(skyBoxMesh);
   light.position.set( 1, 1, 1 );
   scene.add( light );
 
-  projector = new THREE.Projector();
-
   var light2 = new THREE.DirectionalLight( 0xffffff, 0.75);
   light2.position.set( -1, - 0.5, -1 );
   scene.add( light2 );
@@ -165,7 +153,7 @@ scene.add(skyBoxMesh);
       }
 
 			// Position your model in the scene (world space).objects
-      ring.position.set(0,-1.5,20);
+      ring.position.set(-3,-1.5,20);
       ring.rotation.y = 4.6;
 			// Scale your model to the correct size.
       ring.scale.x = ring.scale.y = ring.scale.z = 0.03;
@@ -186,7 +174,7 @@ scene.add(skyBoxMesh);
 
         // Position your model in the scene (world space).
         terrain.position.x = 0;
-        terrain.position.y = 11;
+        terrain.position.y = 14.5;
         terrain.position.z = 0;
 
         // Scale your model to the correct size.
