@@ -58,6 +58,8 @@ var projector;
 var skyBoxMesh;
 var texture_placeholder;
 
+var score = 0;
+
 function init() {
 
   renderer = new THREE.WebGLRenderer();
