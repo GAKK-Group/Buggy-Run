@@ -68,6 +68,7 @@ function init() {
     renderer.setSize( window.innerWidth, window.innerHeight );
   }
 
+  // Stats of performance of game
   stats = new Stats();
   stats.domElement.style.position = 'absolute';
   stats.domElement.style.top = '0px';
@@ -82,13 +83,9 @@ function init() {
   camera.position.set(-4,0,30);
   camera.lookAt(scene.position);
 
-
   raycaster = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3( 0 ,-1, 0), 0, 10);
 
-
-
   initScene();
-
 
   render();
 }
@@ -96,6 +93,7 @@ function init() {
 
 function initScene() {
 
+  // Skybox
   texture_placeholder = document.createElement( 'canvas' );
   texture_placeholder.width = 128;
   texture_placeholder.height = 128;
@@ -114,21 +112,18 @@ function initScene() {
   ];
 
 skyBoxMesh = new THREE.Mesh( new THREE.BoxGeometry( 10000, 10000, 10000, 7, 7, 7), new THREE.MeshFaceMaterial( materials ));
-
 skyBoxMesh.scale.x = - 1;
 scene.add(skyBoxMesh);
 
+  // Add light
   var light = new THREE.DirectionalLight( 0xffffff, 1.5 );
   light.position.set( 1, 1, 1 );
   scene.add( light );
 
-  /*var light2 = new THREE.DirectionalLight( 0xffffff, 0.75);
-  light2.position.set( -1, - 0.5, -1 );
-  scene.add( light2 );*/
-
   myColladaLoader = new THREE.ColladaLoader();
   myColladaLoader.options.convertUpAxis = true;
 
+  // Import ring model
 	var ring = myColladaLoader.load( 'ringanimated.DAE', function ( collada ) {
 			// Here we store the dae in a global variable.
 			ring = collada.scene;
@@ -166,7 +161,7 @@ scene.add(skyBoxMesh);
 
 		} );
 
-
+    // Import terrain model
     myColladaLoader.load( 'TerrainAza (2).DAE', function ( collada ) {
         // Here we store the dae in a global variable.
         terrain = collada.scene;
@@ -190,6 +185,7 @@ scene.add(skyBoxMesh);
 
 }
 
+// Start the animations
 function startAnimations() {
   for ( var i = 0; i < keyFrameAnimationsLength; i++)  {
     var animation = keyFrameAnimations[i];
@@ -197,7 +193,7 @@ function startAnimations() {
   }
 }
 
-
+// Loop through the animations when animations finished
 function loopAnimations() {
   for ( var i = 0; i < keyFrameAnimationsLength; i ++ ) {
     if(keyFrameAnimations[i].isPlaying && !keyFrameAnimations[i].isPaused) {
@@ -219,15 +215,16 @@ function render() {
 
   var tmpY = camera.position.y;
 
+  // Check camera rotation
   var matrix = new THREE.Matrix4();
   matrix.extractRotation( camera.matrix );
-
   var direction = new THREE.Vector3( 0,0,-1);
   direction = direction.applyMatrix4(matrix);
 
   var directionB = new THREE.Vector3(0,0,-1).negate();
   directionB = directionB.applyMatrix4(matrix);
 
+  // Raycaster in direction of front and back of camera
   raycasterFC = new THREE.Raycaster( camera.position,direction,0,2);
   var intersectionsF = raycasterFC.intersectObjects( objects, true);
   raycasterBC = new THREE.Raycaster( camera.position, directionB,0,2);
@@ -235,6 +232,7 @@ function render() {
 
   camera.position.y = tmpY;
 
+  // Raycaster gravity down
   raycaster.ray.origin.copy( camera.position );
   raycaster.ray.y -= 1;
   var intersections = raycaster.intersectObjects( objects, true );
@@ -243,6 +241,7 @@ function render() {
 
   camera.position.y = camera.position.y = yVelocity;
 
+  //Debugger
   document.getElementById("debugInfo").innerHTML =  "intersections.length = " + intersections.length +
     "<br>" +"intersectionsF.length = " + intersectionsF.length +
     "<br>" + "intersectionsB.length = " + intersectionsB.length;
@@ -257,13 +256,66 @@ function render() {
     var rotateAngle = Math.PI / 2 * deltaTime;
     var rotation_matrix = new THREE.Matrix4().identity();
 
-    if ( keyboard.pressed("W") ) {
-      if (intersectionsF.length > 0) {
+    // Check intersections with ring, then move.
+    if(intersectionsF.length > 0) {
+      if( intersectionsF[0].object.parent.id == "node-Torus001") {
+        camera.translateZ( -moveDistance );
+        switch (score){
+          score 0:
+            score = score + 10;
+            document.getElementById("score").innerHTML = "Score: " + score;
+            break;
+          score 10:
+            score = score + 10;
+            document.getElementById("score").innerHTML = "Score: " + score;
+            break;
+          score 20:
+            score = score + 10;
+            document.getElementById("score").innerHTML = "Score: " + score;
+            break;
+          score 30:
+            score = score + 10;
+            document.getElementById("score").innerHTML = "Score: " + score;
+            break;
+          score 40:
+            score = score + 10;
+            document.getElementById("score").innerHTML = "Score: " + score;
+            break;
+          score 50:
+            score = score + 10;
+            document.getElementById("score").innerHTML = "Score: " + score;
+            break;
+          score 60:
+            score = score + 10;
+            document.getElementById("score").innerHTML = "Score: " + score;
+            break;
+          score 70:
+            score = score + 10;
+            document.getElementById("score").innerHTML = "Score: " + score;
+            break;
+          score 80:
+            score = score + 10;
+            document.getElementById("score").innerHTML = "Score: " + score;
+            break;
+          score 90:
+            score = score + 10;
+            document.getElementById("score").innerHTML = "Score: " + score;
+            break;
+          score 100:
+            alert("You Win! Press CTRL + R to play again!");
+            break;
+        }
+      }
+    }
+
+    // Movement controls
+    if( keyboard.pressed("W")) {
+      if(intersectionsF.length > 0 ) {
         moveDistance = 0;
       } else {
       camera.translateZ( -moveDistance );
-      }
     }
+  }
     if ( keyboard.pressed("S") ) {
       if (intersectionsB.length > 0) {
         moveDistance = 0;
@@ -278,18 +330,19 @@ function render() {
       camera.rotateOnAxis( new THREE.Vector3(0,1,0), -rotateAngle);
     }
 
-
-
   renderer.render(scene, camera);
 
   stats.update();
 
   requestAnimationFrame(render);
 
+  // Check for animation loop
   for ( var i = 0; i < keyFrameAnimationsLength; i++ ) {
     lastFrameCurrentTime[i] = keyFrameAnimations[i].currentTime;
   }
 }
+
+// Load the skybox textures
 function loadTexture( path ) {
   var texture = new THREE.Texture( texture_placeholder );
   var material = new THREE.MeshBasicMaterial( {map: texture, overdraw: 0.5 });
