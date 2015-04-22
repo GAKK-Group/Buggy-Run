@@ -259,8 +259,12 @@ function render() {
     // Check intersections with ring, then move.
     if(intersectionsF.length > 0) {
       if( intersectionsF[0].object.parent.id == "node-Torus001") {
+        score = score + 10; // Remove me afterwards
+        document.getElementById("score").innerHTML = "Score: " + score; // Remove me afterwards
         camera.translateZ( -moveDistance );
-        switch (score){
+
+        // Switch to move the ring around depnding on score
+        /*switch (score){
           score 0:
             score = score + 10;
             document.getElementById("score").innerHTML = "Score: " + score;
@@ -304,7 +308,7 @@ function render() {
           score 100:
             alert("You Win! Press CTRL + R to play again!");
             break;
-        }
+        } */
       }
     }
 
