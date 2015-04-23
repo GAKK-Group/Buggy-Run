@@ -124,7 +124,7 @@ scene.add(skyBoxMesh);
   myColladaLoader.options.convertUpAxis = true;
 
   // Import ring model
-	var ring = myColladaLoader.load( 'ringanimated.DAE', function ( collada ) {
+	myColladaLoader.load( 'ringanimated.DAE', function ( collada ) {
 			// Here we store the dae in a global variable.
 			ring = collada.scene;
 
@@ -259,56 +259,56 @@ function render() {
     // Check intersections with ring, then move.
     if(intersectionsF.length > 0) {
       if( intersectionsF[0].object.parent.id == "node-Torus001") {
-        score = score + 10; // Remove me afterwards
-        document.getElementById("score").innerHTML = "Score: " + score; // Remove me afterwards
-        camera.translateZ( -moveDistance );
 
         // Switch to move the ring around depnding on score
-        /*switch (score){
-          score 0:
+        switch (score){
+          case 0:
+          ring.position.set(-3,-1.5,30); /*CHANGE ME AND ADD ME TO EACH CASE TO WHERE YOU WANT THE
+           RING TO GO*/
             score = score + 10;
             document.getElementById("score").innerHTML = "Score: " + score;
             break;
-          score 10:
+          case 10:
+          ring.position.set(-3,-1.5,20);
             score = score + 10;
             document.getElementById("score").innerHTML = "Score: " + score;
             break;
-          score 20:
+          case 20:
             score = score + 10;
             document.getElementById("score").innerHTML = "Score: " + score;
             break;
-          score 30:
+          case 30:
             score = score + 10;
             document.getElementById("score").innerHTML = "Score: " + score;
             break;
-          score 40:
+          case 40:
             score = score + 10;
             document.getElementById("score").innerHTML = "Score: " + score;
             break;
-          score 50:
+          case 50:
             score = score + 10;
             document.getElementById("score").innerHTML = "Score: " + score;
             break;
-          score 60:
+          case 60:
             score = score + 10;
             document.getElementById("score").innerHTML = "Score: " + score;
             break;
-          score 70:
+          case 70:
             score = score + 10;
             document.getElementById("score").innerHTML = "Score: " + score;
             break;
-          score 80:
+          case 80:
             score = score + 10;
             document.getElementById("score").innerHTML = "Score: " + score;
             break;
-          score 90:
+          case 90:
             score = score + 10;
             document.getElementById("score").innerHTML = "Score: " + score;
             break;
-          score 100:
+          case 100:
             alert("You Win! Press CTRL + R to play again!");
             break;
-        } */
+        }
       }
     }
 
