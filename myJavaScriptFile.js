@@ -263,49 +263,53 @@ function render() {
         // Switch to move the ring around depnding on score
         switch (score){
           case 0:
-          ring.position.set(-3,-1.5,30); /*CHANGE ME AND ADD ME TO EACH CASE TO WHERE YOU WANT THE
-           RING TO GO*/
+          ring.position.set(-15, -2, 4); //sets the position of the ring after  a hit 
             score = score + 10;
             document.getElementById("score").innerHTML = "Score: " + score;
             break;
           case 10:
-          ring.position.set(-3,-1.5,20);
+          ring.position.set(-24.5,-2 ,70);
             score = score + 10;
             document.getElementById("score").innerHTML = "Score: " + score;
             break;
           case 20:
+		  ring.position.set(-45,-2 ,20);
             score = score + 10;
             document.getElementById("score").innerHTML = "Score: " + score;
             break;
           case 30:
+		    ring.position.set(20,-2, -17);
             score = score + 10;
             document.getElementById("score").innerHTML = "Score: " + score;
             break;
           case 40:
+		  ring.position.set(23,-2, 7);
             score = score + 10;
             document.getElementById("score").innerHTML = "Score: " + score;
             break;
           case 50:
+		  ring.position.set(45,-2, 15);
             score = score + 10;
             document.getElementById("score").innerHTML = "Score: " + score;
             break;
           case 60:
+		    ring.position.set(20,-2, 35);
             score = score + 10;
             document.getElementById("score").innerHTML = "Score: " + score;
             break;
           case 70:
+		  ring.position.set(40,-2, 51);
             score = score + 10;
             document.getElementById("score").innerHTML = "Score: " + score;
             break;
           case 80:
+		  ring.position.set(0,-2, 73);
             score = score + 10;
             document.getElementById("score").innerHTML = "Score: " + score;
             break;
           case 90:
-            score = score + 10;
-            document.getElementById("score").innerHTML = "Score: " + score;
-            break;
-          case 100:
+			score = score + 10;
+			document.getElementById("score").innerHTML = "Score: " + score;
             alert("You Win! Press CTRL + R to play again!");
             break;
         }
